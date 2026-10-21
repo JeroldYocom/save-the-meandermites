@@ -1,0 +1,17 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  sim-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Boundary check
+        run: bash .claude/skills/sim-view-boundary/scripts/check-boundary.sh Assets/Sim
+      - name: Sim tests
+        run: dotnet test Sim/Meandermites.Sim.Tests --nologo -v minimal

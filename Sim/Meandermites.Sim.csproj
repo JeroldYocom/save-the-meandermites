@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Same source files Unity compiles via Assets/Sim/Meandermites.Sim.asmdef.
+       One copy of the code, two compilers: Unity enforces "no UnityEngine"
+       (noEngineReferences), dotnet lets us test without a Unity licence. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <RootNamespace>Meandermites.Sim</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../Assets/Sim/**/*.cs" />
+  </ItemGroup>
+</Project>
