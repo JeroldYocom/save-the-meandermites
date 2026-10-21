@@ -42,3 +42,6 @@ desktop.ini
 
 # Claude Code local state
 .claude/settings.local.json
+
+# Local test tracking (contains personal notes; repo is public)
+/docs/testing/

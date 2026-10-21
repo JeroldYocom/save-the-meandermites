@@ -16,6 +16,9 @@ The same files compile twice: Unity via `Assets/Sim/Meandermites.Sim.asmdef` (`n
 ## Unity layer (Assets/View/)
 Scene-light: `GameBootstrap` starts itself on Play in any scene and builds the camera, `SimRunner` (fixed-step pump, input latch, input recording, replay check), `SimRenderer` (placeholder shapes made in code, no imported art) and `HudOverlay` (IMGUI). Unity asmdef `Meandermites.View` references `Meandermites.Sim`; the Sim must never reference it. Input uses the new Input System only (`activeInputHandler: 1`), so never call `UnityEngine.Input`. Enter Play Mode options skip the domain reload, so statics survive between plays: re-check Unity-object statics for null. View tests: `Assets/Tests/EditMode/` (headless run in the `unity-headless` skill). EditMode tests prove it builds and runs; only the Editor can judge how it looks or feels.
 
+## Test tracking
+`docs/testing/` holds three numbered documents: To Test (what the user must try), Verified Not Yet Closed (passed but doubtful), and Verified Log (evidence plus the user's comments). Read `docs/testing/README.md` and follow the `test-tracking` skill whenever you build, verify or finish something. IDs are TC-### and never change. These files are local: do not commit them unless asked. GitHub issues are only for defects and work items that come out of testing, and the user must be told whenever one is created.
+
 ## Repo hygiene
 - Force Text serialization stays on. `.meta` files are committed. Binaries go through Git LFS (`.gitattributes`).
 - Public repo, **deliberately no LICENSE** (source-visible, all rights reserved). Do not add one.
