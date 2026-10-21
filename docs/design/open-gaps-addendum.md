@@ -1,5 +1,7 @@
 # Meandermites — Open Specification Gaps
 
+> **Status 2026-10-21:** the four blocking gaps in section 1 are decided. See [decisions-0001-blocking-gaps.md](decisions-0001-blocking-gaps.md); where it differs from the recommendations below, it wins.
+
 **Addendum to GDD v3.1** · 21 October 2026
 
 *Companion to the master design document. Four items block the first coding sessions; five are deferred with due dates. One of them corrects an error in v3.1 §15.1.*

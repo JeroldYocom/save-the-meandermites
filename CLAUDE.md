@@ -20,4 +20,4 @@ The same files compile twice: Unity via `Assets/Sim/Meandermites.Sim.asmdef` (`n
 - Do not edit `ProjectSettings/*.asset` while Unity is open.
 
 ## Design source of truth
-`docs/design/` (see its README for the GDD and the open-gaps addendum). Four blocking gaps must be closed before writing sim code: enemy targeting, enemy-barrier reaction, spawn rules, Breathe architecture.
+`docs/design/` (see its README). The four blocking gaps are decided in `docs/design/decisions-0001-blocking-gaps.md`: read it before writing Sim code (lock-on targeting, per-enemy barrier reactions in data, Spawn Portals, Breathe in the Sim).
