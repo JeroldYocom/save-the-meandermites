@@ -20,7 +20,7 @@ namespace Meandermites.Sim
         public const float FieldHeight = 9f;
 
         // Movement
-        public const float BaseMiteSpeed = 1.4f;
+        public const float BaseMiteSpeed = 0.9f;
         public const float MaxMiteSpeed = 3.0f;
         public const float MiteRadius = 0.4f;
 
@@ -32,13 +32,13 @@ namespace Meandermites.Sim
 
         // Barrier
         public const float BarrierRadius = 1.1f;
-        public const int BarrierDurationSteps = 150;   // 3.0 s
-        public const int BarrierCooldownSteps = 50;    // 1.0 s after expiry
+        public const int BarrierDurationSteps = 100;   // 2.0 s
+        public const int BarrierCooldownSteps = 25;    // 0.5 s after expiry
         public const int TriggerImmunitySteps = 30;    // 0.6 s
 
         // Reaction and The Catch
         public const int ReactionSteps = 100;          // 2.0 s
-        public const int CatchSteps = 100;             // 2.0 s struggle
+        public const int CatchSteps = 75;              // 1.5 s struggle
         public const float RescueFlingDistance = 3.0f;
         public const int RescueInvincibleSteps = 50;   // 1.0 s
         public const float RescuePanic = 1.0f;
@@ -46,7 +46,7 @@ namespace Meandermites.Sim
         // Breathe. The GDD says "0.25 for 2 seconds, cooldown 20s" without
         // saying real or sim time; see docs/design/sim-interpretations.md.
         public const float BreatheRateScale = 0.25f;
-        public const int BreatheActiveSteps = 25;      // 2 real s at 0.25 rate
+        public const int BreatheActiveSteps = 15;      // 1.2 real s at 0.25 rate
         public const int BreatheCooldownSteps = 1000;  // 20 s of sim time
 
         // Spawn placement (see SpawnPlanner)
