@@ -45,7 +45,7 @@ namespace Meandermites.Sim.Tests
         }
 
         [Test]
-        public void BarrierLastsThreeSecondsThenCoolsDownForOne()
+        public void BarrierLastsTwoSecondsThenCoolsDownForHalfASecond()
         {
             var sim = AwayFromEverything();
             // Tap on every step; only the accepted taps should show up.
@@ -56,10 +56,10 @@ namespace Meandermites.Sim.Tests
                 active[i] = sim.Barrier.Active;
             }
 
-            // Steps are 1-based in the comments: active 1..150, off 151..200, active again at 201.
-            for (int step = 1; step <= 150; step++) Assert.IsTrue(active[step - 1], "step " + step);
-            for (int step = 151; step <= 200; step++) Assert.IsFalse(active[step - 1], "step " + step);
-            Assert.IsTrue(active[200], "step 201");
+            // Steps are 1-based in the comments: active 1..100, off 101..125, active again at 126.
+            for (int step = 1; step <= 100; step++) Assert.IsTrue(active[step - 1], "step " + step);
+            for (int step = 101; step <= 125; step++) Assert.IsFalse(active[step - 1], "step " + step);
+            Assert.IsTrue(active[125], "step 126");
         }
 
         [Test]

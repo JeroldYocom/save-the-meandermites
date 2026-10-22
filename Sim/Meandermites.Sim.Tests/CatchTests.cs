@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Meandermites.Sim.Tests
 {
-    /// <summary>GDD 8.4: reaching the flame is a rescuable 2-second struggle.</summary>
+    /// <summary>GDD 8.4: reaching the flame is a rescuable struggle (1.5 s after the 2026-10-22 retune).</summary>
     public class CatchTests
     {
         [Test]
@@ -14,8 +14,8 @@ namespace Meandermites.Sim.Tests
 
             float dist = Scenario.Distance(sim.Mites[0].Position, Scenario.Flame);
             Assert.LessOrEqual(dist, SimConstants.CatchRadius);
-            // 1.4 speed + 0.45 pull = 1.85 u/s over 4.1 units is about 111 steps.
-            Assert.That(steps, Is.InRange(108, 114));
+            // 0.9 speed + 0.45 pull = 1.35 u/s over 4.1 units is about 152 steps.
+            Assert.That(steps, Is.InRange(149, 155));
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace Meandermites.Sim.Tests
         }
 
         [Test]
-        public void MiteDiesAfterExactlyTwoSecondsOfStruggle()
+        public void MiteDiesAfterExactlyOneAndAHalfSecondsOfStruggle()
         {
             var sim = Scenario.LeftOfFlame();
             Scenario.RunUntilCaught(sim);
@@ -48,13 +48,13 @@ namespace Meandermites.Sim.Tests
 
             Assert.AreEqual(MiteState.Dead, sim.Mites[0].State);
             Assert.AreEqual(SimConstants.CatchSteps, stepsCaught);
-            Assert.AreEqual(2.0f, stepsCaught * SimConstants.StepSeconds, 1e-4f);
+            Assert.AreEqual(1.5f, stepsCaught * SimConstants.StepSeconds, 1e-4f);
         }
 
         [Test]
         public void FlamePullIsHalvedWhileItHoldsAMite()
         {
-            // The first Mite is caught at about step 111 while the second,
+            // The first Mite is caught at about step 152 while the second,
             // eight units out, is still walking.
             var sim = Scenario.Many(20000,
                 new[] { MiteReaction.TurnLeft, MiteReaction.TurnLeft },
@@ -68,11 +68,11 @@ namespace Meandermites.Sim.Tests
                 SimConstants.BasePullStrength * SimConstants.PullScaleWhileHolding,
                 sim.CurrentPullStrength, 1e-6f);
 
-            // Measure the walking Mite's real speed: 1.4 steering + 0.225 pull.
+            // Measure the walking Mite's real speed: 0.9 steering + 0.225 pull.
             SimVec2 before = sim.Mites[1].Position;
             sim.Step();
             float speed = Scenario.Distance(before, sim.Mites[1].Position) / SimConstants.StepSeconds;
-            Assert.AreEqual(1.4f + 0.225f, speed, 1e-3f);
+            Assert.AreEqual(0.9f + 0.225f, speed, 1e-3f);
         }
 
         [Test]
@@ -151,8 +151,8 @@ namespace Meandermites.Sim.Tests
         [Test]
         public void MitesCaughtWhenTheFlameDiesAreReleased()
         {
-            var sim = Scenario.LeftOfFlame(durationSteps: 150);
-            Scenario.Run(sim, 149);
+            var sim = Scenario.LeftOfFlame(durationSteps: 200);
+            Scenario.Run(sim, 199);
             Assert.AreEqual(MiteState.Caught, sim.Mites[0].State);
             Assert.AreEqual(SimOutcome.Running, sim.Outcome);
 

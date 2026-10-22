@@ -9,11 +9,11 @@ namespace Meandermites.Sim.Tests
         [Test]
         public void StepDurationsMatchTheirSecondsInTheGdd()
         {
-            Assert.AreEqual(SimConstants.CatchSteps, SimConstants.Steps(2.0f));
+            Assert.AreEqual(SimConstants.CatchSteps, SimConstants.Steps(1.5f));
             Assert.AreEqual(SimConstants.ReactionSteps, SimConstants.Steps(2.0f));
             Assert.AreEqual(SimConstants.TriggerImmunitySteps, SimConstants.Steps(0.6f));
-            Assert.AreEqual(SimConstants.BarrierDurationSteps, SimConstants.Steps(3.0f));
-            Assert.AreEqual(SimConstants.BarrierCooldownSteps, SimConstants.Steps(1.0f));
+            Assert.AreEqual(SimConstants.BarrierDurationSteps, SimConstants.Steps(2.0f));
+            Assert.AreEqual(SimConstants.BarrierCooldownSteps, SimConstants.Steps(0.5f));
             Assert.AreEqual(SimConstants.RescueInvincibleSteps, SimConstants.Steps(1.0f));
             Assert.AreEqual(SimConstants.BreatheCooldownSteps, SimConstants.Steps(20.0f));
         }
@@ -35,7 +35,7 @@ namespace Meandermites.Sim.Tests
         {
             var sim = Scenario.LeftOfFlame();
             sim.Step(SimInput.BreatheNow);
-            // Active on steps 1..25 inclusive, so the 26th step is the first inactive one.
+            // Active on steps 1..15 inclusive, so the 16th step is the first inactive one.
             Scenario.Run(sim, SimConstants.BreatheActiveSteps - 1);
             Assert.IsTrue(sim.Breathe.Active);
             sim.Step();
