@@ -39,13 +39,14 @@ Gameplay lives in `Assets/Sim/` (`Meandermites.Sim`): plain C#, **no `UnityEngin
 ## Design documents
 - **GDD v3.1** (master design) and the design review and setup plan live as Claude artifacts: links are in `docs/design/README.md`. The GDD's markdown source was lost; only the published artifact exists.
 - `docs/design/decisions-0001-blocking-gaps.md`: the four decisions made before coding (lock-on enemy targeting, per-enemy barrier reactions defined in data, Spawn Portals, Breathe in the Sim). **Where it differs from the GDD, it wins.**
-- `docs/design/sim-interpretations.md`: ten places the GDD was ambiguous and what was chosen. The biggest is Breathe: "0.25 for 2 seconds" was implemented as 2 *real* seconds (25 steps). If the rescue feels too hard, change `BreatheActiveSteps` to 100.
+- `docs/design/sim-interpretations.md`: ten places the GDD was ambiguous and what was chosen. The biggest is Breathe: "0.25 for 2 seconds" was implemented in *real* seconds. After the first playtest (2026-10-22) it was shortened to 15 steps (1.2 real s); it already felt long, so do not lengthen it to 100.
 - `docs/design/open-gaps-addendum.md`: the original recommendations plus five deferred gaps (Daily Challenge generator, Survival curve, cloud-save conflicts, teaching copy for 14 levels, art style reference).
 
 ## Not built yet
 Enemies and Aggro Lines, panic effects, Super Barrier, Flame Pulse, Last Gasp, terrain (Gloom Moss), wind, Mite abilities and personalities, Huddle, the Whistle, scoring, portal patterns other than all-at-once, the second barrier slot, touch-offset ghost preview, any Android build.
 
 ## Open items
+0. **First playtest done 2026-10-22; pacing retuned** (speed 0.9, barrier 2.0 s, cooldown 0.5 s, Catch 1.5 s; see the wiki Feel Tuning Log). Next: re-play and re-judge TC-023. Spawn Portal visuals (a fade-in with a few variations) are requested and not built.
 1. **Playtest** and answer the Phase 0 gate: does the last-second rescue feel good?
 2. Decide Breathe's duration after playing.
 3. Decide whether to add Unity tests to CI (needs a Unity licence secret and 15-25 min per run, so pull requests only).
