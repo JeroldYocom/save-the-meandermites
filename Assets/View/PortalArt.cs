@@ -14,8 +14,8 @@ namespace Meandermites.View
 
     /// <summary>
     /// One Spawn Portal drawn with placeholder shapes. It fades in while the
-    /// Sim counts down to the release, pops when the Mites come out, then
-    /// fades away. Everything here is a function of the step count.
+    /// Sim counts down to the release, holds while the Mites come out one by
+    /// one, then pops and fades away. Everything here is a function of the step count.
     /// </summary>
     public sealed class PortalArt
     {
@@ -83,7 +83,7 @@ namespace Meandermites.View
             }
             else
             {
-                float k = 1f - Mathf.Clamp01((float)(step - portal.ReleaseStep) / LingerSteps);
+                float k = 1f - Mathf.Clamp01((float)(step - portal.LastReleaseStep) / LingerSteps);
                 alpha = k;
                 size = 1f + 0.5f * (1f - k);
             }

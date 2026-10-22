@@ -15,7 +15,7 @@ namespace Meandermites.Sim
     /// the Unity layer pumps Step() and renders what it reads back.
     ///
     /// Order within one step is fixed and load-bearing:
-    ///   0. Spawn Portals that finished fading in release their Mites
+    ///   0. Spawn Portals that finished fading in release their Mites, one at a time
     ///   1. age timers (barrier, Breathe, per-Mite counters)
     ///   2. apply the player's input
     ///   3. barrier triggers and rescues
@@ -60,7 +60,8 @@ namespace Meandermites.Sim
             for (int k = 0; k < portalPositions.Length; k++)
             {
                 int count = config.PortalCounts[k];
-                _portals.Add(new PortalSim(portalPositions[k], first, count, SimConstants.PortalFadeInSteps));
+                _portals.Add(new PortalSim(portalPositions[k], first, count,
+                    SimConstants.PortalFadeInSteps, SimConstants.PortalSpawnIntervalSteps));
                 first += count;
             }
 
@@ -170,12 +171,13 @@ namespace Meandermites.Sim
         private void ReleasePortal(PortalSim p)
         {
             if (p.Released || StepCount < p.ReleaseStep) return;
-            p.Released = true;
             for (int j = 0; j < p.MiteCount; j++)
             {
                 MiteSim m = _mites[p.FirstMite + j];
-                if (m.State == MiteState.Unspawned) m.State = MiteState.Walking;
+                if (m.State == MiteState.Unspawned && StepCount >= p.ReleaseStepOf(j))
+                    m.State = MiteState.Walking;
             }
+            if (StepCount >= p.LastReleaseStep) p.Released = true;
         }
 
         private static void TickMiteCounters(MiteSim m)

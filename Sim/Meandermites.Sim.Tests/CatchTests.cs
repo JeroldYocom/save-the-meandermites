@@ -14,8 +14,8 @@ namespace Meandermites.Sim.Tests
 
             float dist = Scenario.Distance(sim.Mites[0].Position, Scenario.Flame);
             Assert.LessOrEqual(dist, SimConstants.CatchRadius);
-            // 0.9 speed + 0.45 pull = 1.35 u/s over 4.1 units is about 152 steps.
-            Assert.That(steps, Is.InRange(149, 155));
+            // 1.1 speed + 0.45 pull = 1.55 u/s over 4.1 units is about 132 steps.
+            Assert.That(steps, Is.InRange(129, 135));
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace Meandermites.Sim.Tests
         [Test]
         public void FlamePullIsHalvedWhileItHoldsAMite()
         {
-            // The first Mite is caught at about step 152 while the second,
+            // The first Mite is caught at about step 132 while the second,
             // eight units out, is still walking.
             var sim = Scenario.Many(20000,
                 new[] { MiteReaction.TurnLeft, MiteReaction.TurnLeft },
@@ -68,11 +68,11 @@ namespace Meandermites.Sim.Tests
                 SimConstants.BasePullStrength * SimConstants.PullScaleWhileHolding,
                 sim.CurrentPullStrength, 1e-6f);
 
-            // Measure the walking Mite's real speed: 0.9 steering + 0.225 pull.
+            // Measure the walking Mite's real speed: 1.1 steering + 0.225 pull.
             SimVec2 before = sim.Mites[1].Position;
             sim.Step();
             float speed = Scenario.Distance(before, sim.Mites[1].Position) / SimConstants.StepSeconds;
-            Assert.AreEqual(0.9f + 0.225f, speed, 1e-3f);
+            Assert.AreEqual(1.1f + 0.225f, speed, 1e-3f);
         }
 
         [Test]

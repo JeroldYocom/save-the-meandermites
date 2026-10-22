@@ -20,7 +20,7 @@ namespace Meandermites.Sim
         public const float FieldHeight = 9f;
 
         // Movement
-        public const float BaseMiteSpeed = 0.9f;
+        public const float BaseMiteSpeed = 1.1f;
         public const float MaxMiteSpeed = 3.0f;
         public const float MiteRadius = 0.4f;
 
@@ -51,6 +51,7 @@ namespace Meandermites.Sim
 
         // Spawn placement (see SpawnPlanner)
         public const int PortalFadeInSteps = 50;       // 1.0 s: the portal fades in, then releases its Mites
+        public const int PortalSpawnIntervalSteps = 12; // 0.24 s between Mites leaving a portal
         public const float SpawnSpacing = 0.9f;
         public const float PerimeterSlideStep = 0.25f;
     }

@@ -37,13 +37,44 @@ namespace Meandermites.Sim.Tests
 
             sim.Step();
 
-            Assert.IsTrue(sim.Portals[0].Released);
-            for (int i = 0; i < 3; i++)
+            // Only the first Mite has left; it starts walking on the same step.
+            Assert.AreEqual(MiteState.Walking, sim.Mites[0].State);
+            Assert.Greater(Scenario.Distance(start[0], sim.Mites[0].Position), 0f);
+            Assert.AreEqual(MiteState.Unspawned, sim.Mites[1].State);
+            Assert.AreEqual(MiteState.Unspawned, sim.Mites[2].State);
+            Assert.IsFalse(sim.Portals[0].Released);
+        }
+
+        [Test]
+        public void MitesLeaveOneAtATimeOnAFixedBeat()
+        {
+            var sim = PortalLevel(7, 4);
+            int gap = SimConstants.PortalSpawnIntervalSteps;
+            Assert.AreEqual(12, gap, "0.24 s");
+
+            for (int j = 0; j < 4; j++)
             {
-                Assert.AreEqual(MiteState.Walking, sim.Mites[i].State);
-                Assert.Greater(Scenario.Distance(start[i], sim.Mites[i].Position), 0f,
-                    "a released Mite starts walking on the same step");
+                // Mite j leaves during step number FadeIn + j * gap + 1.
+                int target = SimConstants.PortalFadeInSteps + j * gap + 1;
+                Scenario.Run(sim, target - (int)sim.StepCount);
+                for (int i = 0; i < 4; i++)
+                {
+                    MiteState expected = i <= j ? MiteState.Walking : MiteState.Unspawned;
+                    Assert.AreEqual(expected, sim.Mites[i].State, "after Mite " + j + " left, Mite " + i);
+                }
+                Assert.AreEqual(j == 3, sim.Portals[0].Released);
             }
+        }
+
+        [Test]
+        public void EachPortalOfAGroupStartsItsOwnBeatAtTheSameTime()
+        {
+            var sim = PortalLevel(7, 2, 2);
+            Scenario.Run(sim, SimConstants.PortalFadeInSteps + 1);
+            Assert.AreEqual(MiteState.Walking, sim.Mites[0].State);
+            Assert.AreEqual(MiteState.Unspawned, sim.Mites[1].State);
+            Assert.AreEqual(MiteState.Walking, sim.Mites[2].State);
+            Assert.AreEqual(MiteState.Unspawned, sim.Mites[3].State);
         }
 
         [Test]
@@ -119,7 +150,7 @@ namespace Meandermites.Sim.Tests
         {
             var calm = PortalLevel(9, 3);
             var busy = PortalLevel(9, 3);
-            for (int i = 0; i < SimConstants.PortalFadeInSteps + 1; i++)
+            for (int i = 0; i < calm.Portals[0].LastReleaseStep + 1; i++)
             {
                 calm.Step();
                 busy.Step(i % 7 == 0 ? SimInput.Barrier(8f, 4.5f) : SimInput.None);
