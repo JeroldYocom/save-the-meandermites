@@ -110,8 +110,8 @@ namespace Meandermites.Tests.EditMode
             var renderer = NewObject("renderer").AddComponent<SimRenderer>();
             renderer.Build(runner.Sim);
 
-            // field, barrier disc + ring, flame, catch ring, and 2 per Mite.
-            Assert.AreEqual(5 + 2 * runner.Sim.Mites.Count, renderer.ObjectCount);
+            // field, portals holder, barrier disc + ring, flame, catch ring, and 2 per Mite.
+            Assert.AreEqual(6 + 2 * runner.Sim.Mites.Count, renderer.ObjectCount);
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace Meandermites.Tests.EditMode
             runner.Begin(Presets.Build(3, 9));
             renderer.Build(runner.Sim);
 
-            Assert.AreEqual(5 + 2 * runner.Sim.Mites.Count, renderer.ObjectCount);
+            Assert.AreEqual(6 + 2 * runner.Sim.Mites.Count, renderer.ObjectCount);
             Assert.AreNotEqual(first, renderer.ObjectCount, "preset 3 has a different Mite count");
         }
 

@@ -27,13 +27,22 @@ namespace Meandermites.View
         private SpriteRenderer _barrierDisc;
         private SpriteRenderer _barrierRing;
         private readonly List<MiteView> _mites = new List<MiteView>();
+        private readonly List<PortalArt> _portals = new List<PortalArt>();
+        private int _portalStyleMode; // 0 = a different look per portal, 1..4 = every portal the same
 
         public int ObjectCount => _root == null ? 0 : _root.childCount;
+
+        /// <summary>"Mixed", or the name of the one style every portal uses.</summary>
+        public string PortalStyleName => _portalStyleMode == 0 ? "Mixed" : PortalArt.StyleName((PortalStyle)(_portalStyleMode - 1));
+
+        /// <summary>Cycle Mixed, Ring, Swirl, Rift, Bloom. Call Build again to see it.</summary>
+        public void CyclePortalStyle() => _portalStyleMode = (_portalStyleMode + 1) % (PortalArt.StyleCount + 1);
 
         public void Build(Simulation sim)
         {
             if (_root != null) DestroyNow(_root.gameObject);
             _mites.Clear();
+            _portals.Clear();
 
             _root = new GameObject("SimView").transform;
             _root.SetParent(transform, false);
@@ -41,6 +50,16 @@ namespace Meandermites.View
             var field = MakeSprite("Field", ViewSprites.Square, Lavender, -10);
             field.transform.position = new Vector3(SimConstants.FieldWidth * 0.5f, SimConstants.FieldHeight * 0.5f, 0f);
             field.transform.localScale = new Vector3(SimConstants.FieldWidth, SimConstants.FieldHeight, 1f);
+
+            var portalHolder = new GameObject("Portals").transform;
+            portalHolder.SetParent(_root, false);
+            for (int k = 0; k < sim.Portals.Count; k++)
+            {
+                PortalStyle style = _portalStyleMode == 0
+                    ? (PortalStyle)(k % PortalArt.StyleCount)
+                    : (PortalStyle)(_portalStyleMode - 1);
+                _portals.Add(new PortalArt(portalHolder, style, sim.Portals[k].Position, k));
+            }
 
             _barrierDisc = MakeSprite("BarrierDisc", ViewSprites.Disc, BarrierColour, 1);
             _barrierRing = MakeSprite("BarrierRing", ViewSprites.Ring, BarrierColour, 1);
@@ -91,12 +110,21 @@ namespace Meandermites.View
                 _barrierRing.color = new Color(BarrierColour.r, BarrierColour.g, BarrierColour.b, 0.5f + 0.4f * life);
             }
 
+            for (int k = 0; k < _portals.Count && k < sim.Portals.Count; k++)
+                _portals[k].Refresh(sim.Portals[k], sim.StepCount);
+
             for (int i = 0; i < _mites.Count && i < sim.Mites.Count; i++)
                 RefreshMite(_mites[i], sim.Mites[i], sim.StepCount);
         }
 
         private static void RefreshMite(MiteView view, MiteSim mite, long step)
         {
+            // Still inside a portal that has not opened: nothing to draw.
+            bool waiting = mite.State == MiteState.Unspawned;
+            view.Body.enabled = !waiting;
+            view.Ring.enabled = !waiting;
+            if (waiting) return;
+
             Vector3 pos = ToWorld(mite.Position);
             view.Body.transform.position = pos;
             view.Ring.transform.position = pos;
@@ -114,7 +142,7 @@ namespace Meandermites.View
                     break;
 
                 case MiteState.Caught:
-                    // The ring shrinks as the 2-second struggle runs out.
+                    // The ring shrinks as the struggle runs out.
                     float progress = (float)mite.CaughtSteps / SimConstants.CatchSteps;
                     float flash = 0.5f + 0.5f * Mathf.Sin(step * 0.6f);
                     body = Color.Lerp(body, new Color(1f, 0.15f, 0.1f), 0.4f + 0.5f * flash);

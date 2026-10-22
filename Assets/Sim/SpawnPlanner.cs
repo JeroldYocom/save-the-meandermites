@@ -47,11 +47,21 @@ namespace Meandermites.Sim
         /// </summary>
         public static SimVec2[] Plan(LevelConfig config, SimRandom rng)
         {
+            return Plan(config, rng, out _);
+        }
+
+        /// <summary>
+        /// As above, and also the position of each portal (the centre of its
+        /// group). Empty when the level uses explicit starts and has no portals.
+        /// </summary>
+        public static SimVec2[] Plan(LevelConfig config, SimRandom rng, out SimVec2[] portalPositions)
+        {
             var result = new SimVec2[config.Mites.Length];
 
             if (config.ExplicitStarts != null)
             {
                 for (int i = 0; i < result.Length; i++) result[i] = config.ExplicitStarts[i];
+                portalPositions = new SimVec2[0];
                 return result;
             }
 
@@ -61,13 +71,15 @@ namespace Meandermites.Sim
             // Global rotation, then per-portal jitter, both in quarter units.
             float origin = rng.NextInt(200) * 0.25f;
             int mite = 0;
+            portalPositions = new SimVec2[portals];
             for (int k = 0; k < portals; k++)
             {
                 float jitter = (rng.NextInt(9) - 4) * 0.25f;
                 float centre = origin + k * slot + jitter;
                 int count = config.PortalCounts[k];
 
-                PlaceGroup(centre, count, config.FlamePosition, result, mite);
+                float placed = PlaceGroup(centre, count, config.FlamePosition, result, mite);
+                portalPositions[k] = PerimeterPoint(placed);
                 mite += count;
             }
             return result;
@@ -77,7 +89,7 @@ namespace Meandermites.Sim
         // member is too close to the flame the whole group slides together, so
         // members never pile up on the first valid spot. Bounded, so it always
         // terminates.
-        private static void PlaceGroup(float centre, int count, SimVec2 flame, SimVec2[] result, int first)
+        private static float PlaceGroup(float centre, int count, SimVec2 flame, SimVec2[] result, int first)
         {
             int maxSlides = (int)(Perimeter / SimConstants.PerimeterSlideStep);
             for (int s = 0; s <= maxSlides; s++)
@@ -90,9 +102,10 @@ namespace Meandermites.Sim
                     result[first + j] = p;
                     if (!IsValidSpawn(p, flame)) allValid = false;
                 }
-                if (allValid) return;
+                if (allValid) return centre;
                 centre += SimConstants.PerimeterSlideStep;
             }
+            return centre;
         }
     }
 }

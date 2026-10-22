@@ -50,6 +50,7 @@ namespace Meandermites.Sim
         public const int BreatheCooldownSteps = 1000;  // 20 s of sim time
 
         // Spawn placement (see SpawnPlanner)
+        public const int PortalFadeInSteps = 50;       // 1.0 s: the portal fades in, then releases its Mites
         public const float SpawnSpacing = 0.9f;
         public const float PerimeterSlideStep = 0.25f;
     }

@@ -15,6 +15,7 @@ namespace Meandermites.Sim
     /// the Unity layer pumps Step() and renders what it reads back.
     ///
     /// Order within one step is fixed and load-bearing:
+    ///   0. Spawn Portals that finished fading in release their Mites
     ///   1. age timers (barrier, Breathe, per-Mite counters)
     ///   2. apply the player's input
     ///   3. barrier triggers and rescues
@@ -35,6 +36,7 @@ namespace Meandermites.Sim
 
         private readonly SimRandom _rng;
         private readonly List<MiteSim> _mites;
+        private readonly List<PortalSim> _portals = new List<PortalSim>();
 
         public Simulation(LevelConfig config)
         {
@@ -43,10 +45,24 @@ namespace Meandermites.Sim
             Seed = config.Seed;
             _rng = new SimRandom(config.Seed);
 
-            SimVec2[] starts = SpawnPlanner.Plan(config, _rng);
+            SimVec2[] starts = SpawnPlanner.Plan(config, _rng, out SimVec2[] portalPositions);
             _mites = new List<MiteSim>(config.Mites.Length);
+
+            // Portal levels hold every Mite inside its portal until it opens.
+            // Explicit starts (tests, teaching levels) have no portals and
+            // begin walking at once.
+            bool hasPortals = config.ExplicitStarts == null;
+            MiteState initial = hasPortals ? MiteState.Unspawned : MiteState.Walking;
             for (int i = 0; i < config.Mites.Length; i++)
-                _mites.Add(new MiteSim(config.Mites[i].Id, config.Mites[i].Reaction, starts[i]));
+                _mites.Add(new MiteSim(config.Mites[i].Id, config.Mites[i].Reaction, starts[i], initial));
+
+            int first = 0;
+            for (int k = 0; k < portalPositions.Length; k++)
+            {
+                int count = config.PortalCounts[k];
+                _portals.Add(new PortalSim(portalPositions[k], first, count, SimConstants.PortalFadeInSteps));
+                first += count;
+            }
 
             Barrier = new BarrierSim();
             Breathe = new BreatheSim();
@@ -63,6 +79,7 @@ namespace Meandermites.Sim
 
         public SimVec2 FlamePosition => Config.FlamePosition;
         public IReadOnlyList<MiteSim> Mites => _mites;
+        public IReadOnlyList<PortalSim> Portals => _portals;
         public BarrierSim Barrier { get; }
         public BreatheSim Breathe { get; }
 
@@ -88,6 +105,9 @@ namespace Meandermites.Sim
         public void Step(SimInput input)
         {
             if (Outcome != SimOutcome.Running) return;
+
+            // 0. portals that have finished fading in release their Mites
+            for (int i = 0; i < _portals.Count; i++) ReleasePortal(_portals[i]);
 
             // 1. age timers
             Barrier.Tick();
@@ -144,6 +164,17 @@ namespace Meandermites.Sim
                     }
                 }
                 Outcome = SimOutcome.Won;
+            }
+        }
+
+        private void ReleasePortal(PortalSim p)
+        {
+            if (p.Released || StepCount < p.ReleaseStep) return;
+            p.Released = true;
+            for (int j = 0; j < p.MiteCount; j++)
+            {
+                MiteSim m = _mites[p.FirstMite + j];
+                if (m.State == MiteState.Unspawned) m.State = MiteState.Walking;
             }
         }
 
@@ -275,6 +306,7 @@ namespace Meandermites.Sim
                 h = Mix(h, (ulong)Barrier.CooldownStepsLeft);
                 h = Mix(h, (ulong)Breathe.ActiveStepsLeft);
                 h = Mix(h, (ulong)Breathe.CooldownStepsLeft);
+                for (int i = 0; i < _portals.Count; i++) h = Mix(h, _portals[i].Released ? 1UL : 0UL);
                 return h;
             }
         }

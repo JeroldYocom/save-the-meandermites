@@ -15,6 +15,7 @@ namespace Meandermites.View
         private SimRunner _runner;
         private Camera _camera;
         private string _presetName = "";
+        private string _portalStyle = "Mixed";
         private GUIStyle _text;
         private GUIStyle _big;
         private GUIStyle _small;
@@ -26,6 +27,7 @@ namespace Meandermites.View
         }
 
         public void SetPresetName(string presetName) => _presetName = presetName;
+        public void SetPortalStyleName(string name) => _portalStyle = name;
 
         /// <summary>Breathe button in screen pixels, origin bottom-left (input space).</summary>
         public static Rect BreatheButton()
@@ -151,7 +153,7 @@ namespace Meandermites.View
                 sb.AppendLine();
             }
             sb.AppendLine();
-            sb.AppendLine("seed " + _runner.Config.Seed + "   " + _presetName);
+            sb.AppendLine("seed " + _runner.Config.Seed + "   " + _presetName + "   portal: " + _portalStyle + " (P)");
             if (_runner.ReplayMessage.Length > 0) sb.AppendLine(_runner.ReplayMessage);
             sb.AppendLine("click/tap: barrier   B: breathe   R: restart   N: new seed");
             sb.Append("1-4: preset   V: verify replay");

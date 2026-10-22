@@ -13,7 +13,8 @@ namespace Meandermites.Sim
         Walking,
         Reacting,
         Caught,
-        Dead
+        Dead,
+        Unspawned   // waiting inside a Spawn Portal that has not opened yet
     }
 
     /// <summary>Per-Mite simulation state. The Unity layer reads it, never writes it.</summary>
@@ -44,12 +45,12 @@ namespace Meandermites.Sim
         /// <summary>How many times this Mite has been pulled free. Feeds the tombstone.</summary>
         public int TimesRescued { get; internal set; }
 
-        public MiteSim(int id, MiteReaction reaction, SimVec2 position)
+        public MiteSim(int id, MiteReaction reaction, SimVec2 position, MiteState state = MiteState.Walking)
         {
             Id = id;
             Reaction = reaction;
             Position = position;
-            State = MiteState.Walking;
+            State = state;
         }
 
         public bool IsAlive => State != MiteState.Dead;

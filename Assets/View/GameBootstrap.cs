@@ -68,6 +68,7 @@ namespace Meandermites.View
             _runner.Begin(Presets.Build(_preset, _seed));
             _renderer.Build(_runner.Sim);
             _hud.SetPresetName(Presets.Name(_preset));
+            _hud.SetPortalStyleName(_renderer.PortalStyleName);
         }
 
         private void Update()
@@ -121,6 +122,11 @@ namespace Meandermites.View
             if (kb.nKey.wasPressedThisFrame)
             {
                 _seed = (ulong)Random.Range(1, 1000000);
+                StartLevel();
+            }
+            if (kb.pKey.wasPressedThisFrame)
+            {
+                _renderer.CyclePortalStyle();
                 StartLevel();
             }
             if (kb.digit1Key.wasPressedThisFrame) SetPreset(1);
