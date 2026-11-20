@@ -15,3 +15,37 @@ jobs:
         run: bash .claude/skills/sim-view-boundary/scripts/check-boundary.sh Assets/Sim
       - name: Sim tests
         run: dotnet test Sim/Meandermites.Sim.Tests --nologo -v minimal
+
+  # TC-030. Runs the Unity EditMode tests. It skips itself until the three
+  # secrets below exist, and is non-blocking (continue-on-error) until it has
+  # been seen to pass once, so a licence problem cannot turn the build red.
+  unity-tests:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    steps:
+      - name: Check Unity secrets
+        id: gate
+        run: |
+          if [ -n "$UNITY_LICENSE" ] && [ -n "$UNITY_EMAIL" ] && [ -n "$UNITY_PASSWORD" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unity secrets not set; skipping Unity tests."
+          fi
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.ready == 'true'
+      - uses: actions/cache@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Packages/manifest.json', 'ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-
+      - uses: game-ci/unity-test-runner@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          unityVersion: 6000.6.7f1
+          testMode: editmode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
