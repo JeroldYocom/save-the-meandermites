@@ -1,6 +1,8 @@
-# Obstacles in the field: design proposal (DRAFT, needs approval)
+# Obstacles in the field: design proposal
 
-Status: proposal only. No code written. Raised in the first playtest
+Status: **APPROVED 2026-11-20 and built** (Sim, View preset 5, 9 tests). Decisions: Stone first, Mites slide along it, fixed layout per level.
+
+Originally a proposal only. Raised in the first playtest
 (TC-023): "no obstacles in the field to juggle Mites with".
 
 ## The problem

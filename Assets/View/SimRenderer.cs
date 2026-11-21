@@ -18,6 +18,7 @@ namespace Meandermites.View
         }
 
         private static readonly Color Lavender = new Color(0.86f, 0.82f, 0.95f);
+        private static readonly Color StoneColour = new Color(0.32f, 0.3f, 0.36f);
         private static readonly Color FlameColour = new Color(1f, 0.55f, 0.15f);
         private static readonly Color BarrierColour = new Color(0.3f, 0.85f, 0.95f);
 
@@ -59,6 +60,20 @@ namespace Meandermites.View
                     ? (PortalStyle)(k % PortalArt.StyleCount)
                     : (PortalStyle)(_portalStyleMode - 1);
                 _portals.Add(new PortalArt(portalHolder, style, sim.Portals[k].Position, k));
+            }
+
+            if (sim.Config.Obstacles.Length > 0)
+            {
+                var stoneHolder = new GameObject("Stones").transform;
+                stoneHolder.SetParent(_root, false);
+                for (int s = 0; s < sim.Config.Obstacles.Length; s++)
+                {
+                    SimObstacle o = sim.Config.Obstacles[s];
+                    var stone = MakeSprite("Stone" + s, ViewSprites.Disc, StoneColour, 0);
+                    stone.transform.SetParent(stoneHolder, false);
+                    stone.transform.position = ToWorld(o.Centre);
+                    stone.transform.localScale = Vector3.one * (o.Radius * 2f);
+                }
             }
 
             _barrierDisc = MakeSprite("BarrierDisc", ViewSprites.Disc, BarrierColour, 1);

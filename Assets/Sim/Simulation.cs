@@ -233,6 +233,7 @@ namespace Meandermites.Sim
             SimVec2 outward = (m.Position - FlamePosition).Normalized;
             if (outward.SqrLength <= 0f) outward = new SimVec2(1f, 0f);
             m.Position = m.Position + outward * SimConstants.RescueFlingDistance;
+            ResolveObstacles(m, SimVec2.Zero);
             m.State = MiteState.Walking;
             m.CaughtSteps = 0;
             m.Panic = SimConstants.RescuePanic;
@@ -255,6 +256,36 @@ namespace Meandermites.Sim
             velocity = velocity.ClampLength(SimConstants.MaxMiteSpeed);
 
             m.Position = m.Position + velocity * SimConstants.StepSeconds;
+            ResolveObstacles(m, velocity);
+        }
+
+        /// <summary>
+        /// Stones are solid. A Mite that ends a move inside one is pushed straight
+        /// out to its edge; the sideways part of its velocity is untouched, so it
+        /// slides around. Dead-centre approaches have no sideways part, so they get
+        /// a small fixed nudge (always to the left of the outward normal) instead of
+        /// sticking forever. Stones are checked in array order: keep them apart.
+        /// </summary>
+        private void ResolveObstacles(MiteSim m, SimVec2 velocity)
+        {
+            SimObstacle[] stones = Config.Obstacles;
+            for (int i = 0; i < stones.Length; i++)
+            {
+                SimVec2 d = m.Position - stones[i].Centre;
+                float reach = stones[i].Reach;
+                if (d.SqrLength >= reach * reach) continue;
+
+                SimVec2 n = d.Normalized;
+                if (n.SqrLength <= 0f) n = (-velocity).Normalized;
+                if (n.SqrLength <= 0f) n = new SimVec2(1f, 0f);
+
+                SimVec2 pos = stones[i].Centre + n * reach;
+                SimVec2 tangent = n.Rot90Left;
+                float along = velocity.Dot(tangent);
+                if (along < SimConstants.StoneSlideMinSpeed && along > -SimConstants.StoneSlideMinSpeed)
+                    pos = pos + tangent * (SimConstants.BaseMiteSpeed * 0.5f * SimConstants.StepSeconds);
+                m.Position = pos;
+            }
         }
 
         private static void TickStruggle(MiteSim m)

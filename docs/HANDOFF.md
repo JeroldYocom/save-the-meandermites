@@ -19,7 +19,7 @@ Save the Meandermites is a one-finger Android game about steering tiny, mortal c
 ## Try it
 1. Open the project folder in Unity Hub with editor 6000.6.7f1.
 2. Press **Play** (it starts itself in any scene).
-3. Click/tap = place barrier, `B` = Breathe, `R` = restart, `N` = new seed, `1`-`4` = preset, `V` = verify replay, `P` = cycle the portal look.
+3. Click/tap = place barrier, `B` = Breathe, `R` = restart, `N` = new seed, `1`-`5` = preset (5 = Stones), `V` = verify replay, `P` = cycle the portal look.
 
 ## The architecture rule everything rests on
 Gameplay lives in `Assets/Sim/` (`Meandermites.Sim`): plain C#, **no `UnityEngine`**, fixed 0.02 s step, seeded RNG only, no wall-clock reads, no trig. Unity (`Assets/View/`) feeds input in and draws state out. Breathe is Sim state (not `Time.timeScale`). The same source files compile under Unity (asmdef with `noEngineReferences`) and under `dotnet` (`Sim/Meandermites.Sim.csproj`, netstandard2.1). Reason: the Daily Challenge and Replay need exact reproducibility, and gameplay logic can be tested without opening Unity. See `docs/adr/0001-sim-view-split.md`.
@@ -43,13 +43,13 @@ Gameplay lives in `Assets/Sim/` (`Meandermites.Sim`): plain C#, **no `UnityEngin
 - `docs/design/open-gaps-addendum.md`: the original recommendations plus five deferred gaps (Daily Challenge generator, Survival curve, cloud-save conflicts, teaching copy for 14 levels, art style reference).
 
 ## Not built yet
-Enemies and Aggro Lines, panic effects, Super Barrier, Flame Pulse, Last Gasp, terrain (Gloom Moss), wind, Mite abilities and personalities, Huddle, the Whistle, scoring, portal patterns other than one-at-a-time, obstacles in the field, the second barrier slot, touch-offset ghost preview, any Android build.
+Enemies and Aggro Lines, panic effects, Super Barrier, Flame Pulse, Last Gasp, terrain (Gloom Moss), wind, Mite abilities and personalities, Huddle, the Whistle, scoring, portal patterns other than one-at-a-time, obstacle types other than the static Stone, the second barrier slot, touch-offset ghost preview, any Android build.
 
 ## Open items
-0. **First playtest done 2026-10-22; pacing retuned** (Mite speed 1.1, barrier 2.0 s, cooldown 0.5 s, Catch 1.5 s, Breathe 15 steps; see the wiki Feel Tuning Log). **Spawn Portals built:** a 1.0 s fade-in, then Mites leave one at a time 0.24 s apart; four placeholder looks, `P` cycles them. Next: replay and re-judge TC-023 and TC-035. The player also noted there are no obstacles in the field to juggle Mites with; that needs design before building.
+0. **First playtest done 2026-10-22; pacing retuned** (Mite speed 1.1, barrier 2.0 s, cooldown 0.5 s, Catch 1.5 s, Breathe 15 steps; see the wiki Feel Tuning Log). **Spawn Portals built:** a 1.0 s fade-in, then Mites leave one at a time 0.24 s apart; four placeholder looks, `P` cycles them. Next: replay and re-judge TC-023 and TC-035. **Stones built 2026-11-20** (static solid circles, Mites slide round them, fixed layout per level; preset 5; see `docs/design/obstacles-proposal.md`). Needs a play check (TC-039) and a Unity headless View check, which was not run because the Editor was open.
 1. **Playtest** and answer the Phase 0 gate: does the last-second rescue feel good?
 2. Decide Breathe's duration after playing.
-3. Decide whether to add Unity tests to CI (needs a Unity licence secret and 15-25 min per run, so pull requests only).
+3. Unity tests in CI: decided yes (2026-11-20). The `unity-tests` job is in `.github/workflows/ci.yml` and skips itself until the repo secrets `UNITY_LICENSE`, `UNITY_EMAIL`, `UNITY_PASSWORD` exist (TC-030).
 4. **Add the portal to the art commission manifest** (GDD Appendix D) and change the level format to a list of portals (Appendix A). Neither is done in the GDD artifact.
 5. Write the **art style reference** before commissioning any art. It is the one open gap with real schedule risk.
 6. Check determinism on a real Android device (so far only on one Windows PC).

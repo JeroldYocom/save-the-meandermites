@@ -49,6 +49,9 @@ namespace Meandermites.Sim
         public const int BreatheActiveSteps = 15;      // 1.2 real s at 0.25 rate
         public const int BreatheCooldownSteps = 1000;  // 20 s of sim time
 
+        // Stones: below this sideways speed a Mite pressed against a Stone gets a nudge so it cannot stick.
+        public const float StoneSlideMinSpeed = 0.05f;
+
         // Spawn placement (see SpawnPlanner)
         public const int PortalFadeInSteps = 50;       // 1.0 s: the portal fades in, then releases its Mites
         public const int PortalSpawnIntervalSteps = 12; // 0.24 s between Mites leaving a portal

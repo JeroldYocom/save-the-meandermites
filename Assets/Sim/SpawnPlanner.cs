@@ -41,6 +41,19 @@ namespace Meandermites.Sim
             return (p - flame).SqrLength >= min * min;
         }
 
+        /// <summary>As above, and also clear of every Stone.</summary>
+        public static bool IsValidSpawn(SimVec2 p, SimVec2 flame, SimObstacle[] obstacles)
+        {
+            if (!IsValidSpawn(p, flame)) return false;
+            if (obstacles == null) return true;
+            for (int i = 0; i < obstacles.Length; i++)
+            {
+                float reach = obstacles[i].Reach;
+                if ((p - obstacles[i].Centre).SqrLength < reach * reach) return false;
+            }
+            return true;
+        }
+
         /// <summary>
         /// One start position per Mite, in Mite order. Consumes the RNG the
         /// same way every time, so a seed always gives the same layout.
@@ -78,7 +91,7 @@ namespace Meandermites.Sim
                 float centre = origin + k * slot + jitter;
                 int count = config.PortalCounts[k];
 
-                float placed = PlaceGroup(centre, count, config.FlamePosition, result, mite);
+                float placed = PlaceGroup(centre, count, config.FlamePosition, config.Obstacles, result, mite);
                 portalPositions[k] = PerimeterPoint(placed);
                 mite += count;
             }
@@ -89,7 +102,7 @@ namespace Meandermites.Sim
         // member is too close to the flame the whole group slides together, so
         // members never pile up on the first valid spot. Bounded, so it always
         // terminates.
-        private static float PlaceGroup(float centre, int count, SimVec2 flame, SimVec2[] result, int first)
+        private static float PlaceGroup(float centre, int count, SimVec2 flame, SimObstacle[] obstacles, SimVec2[] result, int first)
         {
             int maxSlides = (int)(Perimeter / SimConstants.PerimeterSlideStep);
             for (int s = 0; s <= maxSlides; s++)
@@ -100,7 +113,7 @@ namespace Meandermites.Sim
                     float t = centre + (j - (count - 1) * 0.5f) * SimConstants.SpawnSpacing;
                     SimVec2 p = PerimeterPoint(t);
                     result[first + j] = p;
-                    if (!IsValidSpawn(p, flame)) allValid = false;
+                    if (!IsValidSpawn(p, flame, obstacles)) allValid = false;
                 }
                 if (allValid) return centre;
                 centre += SimConstants.PerimeterSlideStep;

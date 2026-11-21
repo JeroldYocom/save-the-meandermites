@@ -40,6 +40,8 @@ namespace Meandermites.Sim
         /// <summary>Rotate 90 degrees clockwise (y up).</summary>
         public SimVec2 Rot90Right => new SimVec2(Y, -X);
 
+        public float Dot(SimVec2 o) => X * o.X + Y * o.Y;
+
         public SimVec2 ClampLength(float max)
         {
             float sqr = SqrLength;

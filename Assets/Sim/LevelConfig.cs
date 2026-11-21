@@ -14,6 +14,23 @@ namespace Meandermites.Sim
         }
     }
 
+    /// <summary>A solid circle in the field that Mites cannot enter. Static: part of the level, not of the sim state.</summary>
+    public readonly struct SimObstacle
+    {
+        public readonly SimVec2 Centre;
+        public readonly float Radius;
+
+        public SimObstacle(SimVec2 centre, float radius)
+        {
+            if (radius <= 0f) throw new ArgumentException("An obstacle needs a positive radius.");
+            Centre = centre;
+            Radius = radius;
+        }
+
+        /// <summary>Distance from the centre at which a Mite's centre must stay.</summary>
+        public float Reach => Radius + SimConstants.MiteRadius;
+    }
+
     /// <summary>
     /// Everything that defines a level run. The same config and the same
     /// input list always produce the same outcome.
@@ -37,8 +54,12 @@ namespace Meandermites.Sim
         /// </summary>
         public SimVec2[] ExplicitStarts { get; }
 
+        /// <summary>Solid Stones, never null. Empty for levels without obstacles.</summary>
+        public SimObstacle[] Obstacles { get; }
+
         public LevelConfig(ulong seed, int durationSteps, SimVec2 flamePosition,
-                           MiteSpec[] mites, int[] portalCounts, SimVec2[] explicitStarts = null)
+                           MiteSpec[] mites, int[] portalCounts, SimVec2[] explicitStarts = null,
+                           SimObstacle[] obstacles = null)
         {
             if (mites == null || mites.Length == 0)
                 throw new ArgumentException("A level needs at least one Mite.");
@@ -71,6 +92,7 @@ namespace Meandermites.Sim
             Mites = mites;
             PortalCounts = portalCounts;
             ExplicitStarts = explicitStarts;
+            Obstacles = obstacles ?? new SimObstacle[0];
         }
 
         public static SimVec2 FieldCentre =>

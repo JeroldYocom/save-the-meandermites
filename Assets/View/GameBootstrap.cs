@@ -133,6 +133,7 @@ namespace Meandermites.View
             if (kb.digit2Key.wasPressedThisFrame) SetPreset(2);
             if (kb.digit3Key.wasPressedThisFrame) SetPreset(3);
             if (kb.digit4Key.wasPressedThisFrame) SetPreset(4);
+            if (kb.digit5Key.wasPressedThisFrame) SetPreset(5);
         }
 
         private void SetPreset(int preset)
